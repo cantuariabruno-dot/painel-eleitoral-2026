@@ -6,14 +6,30 @@ import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance com charset utf8mb4
+// Lazily create the drizzle instance com charset utf8mb4 e collation utf8mb4_unicode_ci
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      // Adiciona charset utf8mb4 na connection string
-      const sep = process.env.DATABASE_URL.includes("?") ? "&" : "?";
-      const connStr = `${process.env.DATABASE_URL}${sep}charset=utf8mb4`;
-      _db = drizzle(connStr);
+      const url = new URL(process.env.DATABASE_URL);
+      const host = url.hostname;
+      const port = parseInt(url.port || "3306");
+      const user = url.username;
+      const password = url.password;
+      const database = url.pathname.replace("/", "");
+
+      const pool = (await import("mysql2/promise")).default.createPool({
+        host,
+        port,
+        user,
+        password,
+        database,
+        charset: "UTF8MB4_UNICODE_CI",
+        ssl: { rejectUnauthorized: true },
+        waitForConnections: true,
+        connectionLimit: 10,
+      });
+
+      _db = drizzle(pool as any);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
