@@ -1,5 +1,20 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1776101892999,
+      "tag": "0000_productive_ender_wiggin",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1776102032266,
+      "tag": "0001_wet_multiple_man",
+      "breakpoints": true
+    }
+  ]
 }

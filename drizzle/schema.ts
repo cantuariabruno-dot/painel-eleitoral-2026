@@ -1,17 +1,7 @@
 import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -25,4 +15,32 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// Categorias de cargo eleitoral
+export type Categoria = "presidente" | "governador" | "senador" | "geral";
+
+export const noticias = mysqlTable("noticias", {
+  id: int("id").autoincrement().primaryKey(),
+  titulo: varchar("titulo", { length: 500 }).notNull(),
+  url: varchar("url", { length: 1000 }).notNull().unique(),
+  fonte: varchar("fonte", { length: 100 }).notNull(),
+  dataPublicacao: timestamp("data_publicacao"),
+  resumo: text("resumo"),
+  categoria: mysqlEnum("categoria", ["presidente", "governador", "senador", "geral"])
+    .default("geral")
+    .notNull(),
+  criadoEm: timestamp("criado_em").defaultNow().notNull(),
+});
+
+export type Noticia = typeof noticias.$inferSelect;
+export type InsertNoticia = typeof noticias.$inferInsert;
+
+export const atualizacoes = mysqlTable("atualizacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  tipo: varchar("tipo", { length: 50 }).notNull(), // 'rss', 'manual', 'agendado'
+  descricao: text("descricao"),
+  qtdInseridas: int("qtd_inseridas").default(0).notNull(),
+  criadoEm: timestamp("criado_em").defaultNow().notNull(),
+});
+
+export type Atualizacao = typeof atualizacoes.$inferSelect;
+export type InsertAtualizacao = typeof atualizacoes.$inferInsert;
