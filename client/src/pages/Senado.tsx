@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { useMemo, useState } from "react";
 import { Building2, Loader2 } from "lucide-react";
+import MapaSenado from "@/components/MapaSenado";
 
 // Cores por partido
 const CORES_PARTIDO: Record<string, string> = {
@@ -162,7 +163,7 @@ export default function Senado() {
           <h2 className="text-xl font-bold text-white">Senado Federal 2026</h2>
         </div>
         <p className="text-white/50 text-sm">
-          Composição atual e previsão para as 41 vagas em disputa
+          Composição atual e 54 vagas em disputa nas eleições de 2026
         </p>
       </div>
 
@@ -190,6 +191,17 @@ export default function Senado() {
               </div>
             </div>
             <SemicirculoSenado cadeiras={cadeiras as Cadeira[]} />
+          </div>
+
+          {/* Mapa do Brasil — vagas em disputa por partido */}
+          <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
+                Mapa das Vagas em Disputa — 2026
+              </h3>
+              <span className="text-xs text-white/30">Cor = partido do senador atual</span>
+            </div>
+            <MapaSenado cadeiras={emDisputa} />
           </div>
 
           {/* Distribuição por partido */}

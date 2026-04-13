@@ -27,8 +27,8 @@
 - [x] Visualização de cadeiras do Senado (81 cadeiras) estilo semicírculo parlamentar
 - [x] Cores por partido/coligação
 - [x] Separação: mandatos atuais (2023-2031) vs vagas em disputa 2026 (41 vagas)
-- [ ] Previsão de formação pós-eleição baseada nas pesquisas estaduais (dados pendentes)
-- [ ] Mapa do Brasil com estado colorido por candidato líder ao senado (dados pendentes)
+- [x] Previsão de formação pós-eleição baseada nas pesquisas estaduais (seed com 27 previsões estaduais inseridas)
+- [x] Mapa do Brasil com estado colorido por candidato líder ao senado (implementado na página do Senado via previsões estaduais)
 
 ## Página de Notícias (/noticias)
 - [x] Layout de cards em coluna única (mobile) ou grid 2-3 colunas (desktop)
