@@ -26,7 +26,13 @@
 ## GitHub
 - [x] Sincronização com repositório cantuariabruno-dot/painel-eleitoral-2026
 - [x] Configurar remote origin e fazer primeiro push
-- [ ] Guia de uso do GitHub para o usuário
+- [x] Guia de uso do GitHub para o usuário
 
 ## Testes
 - [x] Vitest para endpoints tRPC de notícias
+
+## Correções e Melhorias
+- [ ] Diagnosticar e corrigir problema de carregamento do site
+- [ ] Buscar notícias dos últimos 30 dias e popular o banco de dados
+- [ ] Configurar renovação diária automática dos feeds RSS
+- [ ] Ampliar filtros de busca para capturar mais notícias relevantes

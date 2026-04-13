@@ -10,7 +10,7 @@ import {
   listarAtualizacoes,
   fontesDiponiveis,
 } from "./db";
-import { buscarEPersistirNoticias, FEEDS } from "./rss";
+import { buscarEPersistirNoticias, cargaHistorica, FEEDS } from "./rss";
 import type { Categoria } from "../drizzle/schema";
 
 const categoriaEnum = z.enum(["presidente", "governador", "senador", "geral"]).optional();
@@ -52,11 +52,19 @@ export const appRouter = router({
         return { items, total };
       }),
 
-    // Buscar e persistir notícias dos feeds RSS
+    // Buscar e persistir notícias dos feeds RSS (renovação diária)
     buscarRSS: publicProcedure.mutation(async () => {
-      const resultado = await buscarEPersistirNoticias();
+      const resultado = await buscarEPersistirNoticias(1);
       return resultado;
     }),
+
+    // Carga histórica dos últimos N dias
+    cargaHistorica: publicProcedure
+      .input(z.object({ dias: z.number().min(1).max(90).default(30) }))
+      .mutation(async ({ input }) => {
+        const resultado = await cargaHistorica(input.dias);
+        return resultado;
+      }),
 
     // Última atualização registrada
     ultimaAtualizacao: publicProcedure.query(async () => {
