@@ -15,6 +15,13 @@
       "when": 1776102032266,
       "tag": "0001_wet_multiple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1776103845842,
+      "tag": "0002_dizzy_strong_guy",
+      "breakpoints": true
     }
   ]
 }

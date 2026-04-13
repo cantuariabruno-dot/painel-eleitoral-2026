@@ -89,9 +89,25 @@ function contemTermo(texto: string, termos: string[]): boolean {
   return termos.some(termo => t.includes(termo));
 }
 
+// ─── Termos de exclusão (notícias claramente fora do contexto eleitoral brasileiro) ────────────────
+const TERMOS_EXCLUSAO = [
+  "bolsas da europa", "bolsas europeias", "bolsas asiáticas", "bolsas internacionais",
+  "wall street", "nasdaq", "dow jones", "s&p 500", "ibovespa cai", "ibovespa sobe",
+  "dólar cai", "dólar sobe", "câmbio", "taxa selic", "juros nos eua",
+  "guerra na ucrânia", "guerra na rússia", "conflito no oriente médio",
+  "eleição no peru", "eleição na argentina", "eleição no chile", "eleição no méxico",
+  "eleição nos eua", "eleição na europa", "eleição na venezuela",
+  "copa do mundo", "olimpíadas", "futebol", "campeonato",
+  "inss gerou surpresa", "novo presidente do inss", "presidente do inss demitido",
+  "perspectivas de crescimento da china", "guerra afeta",
+];
+
 // ─── Filtro em duas camadas ───────────────────────────────────────────────────
 function filtroValido(titulo: string, resumo: string): boolean {
   const texto = `${titulo} ${resumo}`;
+  const t = texto.toLowerCase();
+  // Exclusão: notícias claramente fora do contexto eleitoral brasileiro
+  if (TERMOS_EXCLUSAO.some(termo => t.includes(termo))) return false;
   // Camada 1: pesquisa + eleitoral (filtro principal)
   if (contemTermo(texto, TERMOS_PESQUISA) && contemTermo(texto, TERMOS_ELEITORAIS_PESQUISA)) return true;
   // Camada 2: contexto eleitoral amplo

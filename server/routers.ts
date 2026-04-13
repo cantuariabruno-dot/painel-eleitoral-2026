@@ -4,20 +4,20 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import {
-  listarNoticias,
-  contarNoticias,
-  ultimaAtualizacao,
-  listarAtualizacoes,
-  fontesDiponiveis,
+  getCandidatos,
+  getPesquisas,
+  getPesquisaComIntencoes,
+  getEvolucaoCandidatos,
+  getPrevisoesMapa,
+  getSenadoCadeiras,
+  getNoticias,
+  getFontesNoticias,
+  getUltimaAtualizacao,
 } from "./db";
-import { buscarEPersistirNoticias, cargaHistorica, FEEDS } from "./rss";
-import type { Categoria } from "../drizzle/schema";
-
-const categoriaEnum = z.enum(["presidente", "governador", "senador", "geral"]).optional();
+import { buscarEPersistirNoticias } from "./rss";
 
 export const appRouter = router({
   system: systemRouter,
-
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -27,65 +27,88 @@ export const appRouter = router({
     }),
   }),
 
-  noticias: router({
-    // Listar notícias com filtros opcionais
+  // ─── Candidatos ─────────────────────────────────────────────────────────────
+  candidatos: router({
     listar: publicProcedure
-      .input(
-        z.object({
-          fonte: z.string().optional(),
-          categoria: categoriaEnum,
-          limite: z.number().min(1).max(100).default(50),
-          offset: z.number().min(0).default(0),
-        })
-      )
+      .input(z.object({ cargo: z.enum(["presidente", "governador", "senador"]).optional() }).optional())
       .query(async ({ input }) => {
-        const items = await listarNoticias({
-          fonte: input.fonte,
-          categoria: input.categoria as Categoria | undefined,
-          limite: input.limite,
-          offset: input.offset,
-        });
-        const total = await contarNoticias({
-          fonte: input.fonte,
-          categoria: input.categoria as Categoria | undefined,
-        });
-        return { items, total };
+        return getCandidatos(input?.cargo);
+      }),
+  }),
+
+  // ─── Pesquisas ───────────────────────────────────────────────────────────────
+  pesquisas: router({
+    listar: publicProcedure
+      .input(z.object({
+        cargo: z.enum(["presidente", "governador", "senador"]).optional(),
+        limite: z.number().min(1).max(100).default(20),
+      }).optional())
+      .query(async ({ input }) => {
+        return getPesquisas(input?.cargo, input?.limite ?? 20);
       }),
 
-    // Buscar e persistir notícias dos feeds RSS (renovação diária)
+    detalhe: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return getPesquisaComIntencoes(input.id);
+      }),
+
+    evolucao: publicProcedure
+      .input(z.object({
+        cargo: z.enum(["presidente", "governador", "senador"]).default("presidente"),
+        turno: z.enum(["1", "2"]).default("1"),
+      }))
+      .query(async ({ input }) => {
+        return getEvolucaoCandidatos(input.cargo, input.turno);
+      }),
+  }),
+
+  // ─── Mapa de previsões ───────────────────────────────────────────────────────
+  previsoes: router({
+    mapa: publicProcedure
+      .input(z.object({ cargo: z.enum(["presidente", "senador"]).default("presidente") }))
+      .query(async ({ input }) => {
+        return getPrevisoesMapa(input.cargo);
+      }),
+  }),
+
+  // ─── Senado ──────────────────────────────────────────────────────────────────
+  senado: router({
+    cadeiras: publicProcedure.query(async () => {
+      return getSenadoCadeiras();
+    }),
+  }),
+
+  // ─── Notícias ────────────────────────────────────────────────────────────────
+  noticias: router({
+    listar: publicProcedure
+      .input(z.object({
+        categoria: z.enum(["presidente", "governador", "senador", "geral"]).optional(),
+        fonte: z.string().optional(),
+        limite: z.number().min(1).max(100).default(30),
+        offset: z.number().min(0).default(0),
+      }).optional())
+      .query(async ({ input }) => {
+        const items = await getNoticias({
+          categoria: input?.categoria,
+          fonte: input?.fonte,
+          limite: input?.limite ?? 30,
+          offset: input?.offset ?? 0,
+        });
+        return { items };
+      }),
+
+    fontes: publicProcedure.query(async () => {
+      return getFontesNoticias();
+    }),
+
+    ultimaAtualizacao: publicProcedure.query(async () => {
+      return getUltimaAtualizacao();
+    }),
+
     buscarRSS: publicProcedure.mutation(async () => {
       const resultado = await buscarEPersistirNoticias(1);
       return resultado;
-    }),
-
-    // Carga histórica dos últimos N dias
-    cargaHistorica: publicProcedure
-      .input(z.object({ dias: z.number().min(1).max(90).default(30) }))
-      .mutation(async ({ input }) => {
-        const resultado = await cargaHistorica(input.dias);
-        return resultado;
-      }),
-
-    // Última atualização registrada
-    ultimaAtualizacao: publicProcedure.query(async () => {
-      return ultimaAtualizacao();
-    }),
-
-    // Histórico de atualizações
-    historicoAtualizacoes: publicProcedure
-      .input(z.object({ limite: z.number().min(1).max(50).default(10) }))
-      .query(async ({ input }) => {
-        return listarAtualizacoes(input.limite);
-      }),
-
-    // Fontes disponíveis no banco
-    fontes: publicProcedure.query(async () => {
-      return fontesDiponiveis();
-    }),
-
-    // Lista de feeds configurados
-    feedsConfigurados: publicProcedure.query(() => {
-      return FEEDS.map(f => f.nome);
     }),
   }),
 });
