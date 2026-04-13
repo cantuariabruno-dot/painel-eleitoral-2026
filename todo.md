@@ -32,7 +32,7 @@
 - [x] Vitest para endpoints tRPC de notícias
 
 ## Correções e Melhorias
-- [ ] Diagnosticar e corrigir problema de carregamento do site
-- [ ] Buscar notícias dos últimos 30 dias e popular o banco de dados
-- [ ] Configurar renovação diária automática dos feeds RSS
-- [ ] Ampliar filtros de busca para capturar mais notícias relevantes
+- [x] Diagnosticar e corrigir problema de carregamento do site
+- [x] Buscar notícias dos últimos 30 dias e popular o banco de dados (73 encontradas, 59 inseridas)
+- [x] Configurar renovação diária automática dos feeds RSS (agendado às 7h)
+- [x] Ampliar filtros de busca para capturar mais notícias relevantes (3 camadas de filtro)
